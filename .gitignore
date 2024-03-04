@@ -1,0 +1,57 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+venv*/
+*/venv/
+*/venv*/
+
+# IDE specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Django related files
+*.log
+*.pot
+*.pyc
+db.sqlite3
+/media/
+/static/
+
+# Secret keys
+*.env
+
+# Compiled Python bytecode
+*.pyc
+__pycache__/
+
+# Local development settings
+local_settings.py
+
+# Dependency directories
+pip-wheel-metadata/
+
+# Compiled Python files
+*.pyc
+
+# Unit test / coverage reports
+.coverage
+htmlcov/
+
+# Translations
+*.mo
+
+# Ignore migrations (you should make them manually)
+**/migrations/*.py
+**/migrations/*.pyc
+
+# Ignore database
+*.sqlite3
+
+# Ignore user uploaded files
+media/
