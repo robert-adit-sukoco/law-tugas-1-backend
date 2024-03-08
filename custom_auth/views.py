@@ -31,12 +31,20 @@ class LoginView(APIView):
     def post(self, request):
         req_username = request.data['username']
         req_password = request.data['password']
-
-        user = get_object_or_404(CustomUser, username=req_username)
-
-        if not user.check_password(req_password):
-            return AuthenticationFailed('Username and password do not match!')
         
+        try:
+            user = get_object_or_404(CustomUser, username=req_username)
+
+            if not user.check_password(req_password):
+                raise AuthenticationFailed('Username and password do not match!')
+        except CustomUser.DoesNotExist:
+            return Response({"message": "Username does not exist."}, status=status.HTTP_404_NOT_FOUND)
+        except AuthenticationFailed as e:
+            return Response({"message": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
         payload = {
             'id' : user.username,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7),

@@ -23,4 +23,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path(f'{BASE_DIRECTORY}/auth/', include('custom_auth.urls')),
     path(f'{BASE_DIRECTORY}/games/', include('games.urls')),
+    path(f'{BASE_DIRECTORY}/articles/', include('articles.urls'))
 ]

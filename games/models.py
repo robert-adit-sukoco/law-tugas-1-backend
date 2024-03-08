@@ -6,6 +6,7 @@ import string
 from django.core.validators import MaxValueValidator, MinValueValidator
 from custom_auth.models import CustomUser
 
+DEFAULT_IMAGE = 'https://connect-prd-cdn.unity.com/20230413/learn/images/da6c7837-79c6-411c-bbc4-e56e94b42766_Game_Jam_Start_Blue_2.jpg'
 
 def generate_random_string():
     return ''.join(random.choices(string.ascii_lowercase + string.digits, k=5))
@@ -21,7 +22,10 @@ class Genre(models.Model):
 class Game(models.Model):
     slug = models.SlugField(unique=True, primary_key=True, default='', blank=True)
     title = models.CharField(default='GameName', unique=False, max_length=100, null=False)
+    description = models.CharField(default="The game's description", max_length=255)
+    price = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     genre = models.ManyToManyField(Genre)
+    header_image_src = models.CharField(default=DEFAULT_IMAGE, max_length=255)
 
     def save(self, *args, **kwargs):
         if not self.slug:

@@ -3,6 +3,7 @@ import jwt
 from .serializers import CustomUserSerializer
 from .models import CustomUser
 from rockerboy_backend_app.settings import SECRET_KEY
+from django.shortcuts import get_object_or_404
 
 def get_auth_token(request):
     token = request.META['HTTP_AUTHORIZATION']
@@ -19,11 +20,11 @@ def get_user_from_request(request):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
     except jwt.ExpiredSignatureError:
+        print("Invalid Token")
         raise AuthenticationFailed('Token is either invalid or expired')
     
     get_username = payload['id']
+    user = get_object_or_404(CustomUser, username=get_username)
 
-    user = CustomUser.objects.get(username=get_username)
     serializer = CustomUserSerializer(user)
-
     return serializer.data

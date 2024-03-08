@@ -2,7 +2,9 @@ from django.db.models import Q
 from rest_framework import generics
 from .models import *
 from .serializers import *
+from django.db.models import Avg
 from custom_auth.utils import get_user_from_request
+from rest_framework.response import Response
 
 
 # Create your views here.
@@ -23,6 +25,8 @@ class GameList(generics.ListAPIView):
                 genre_filter |= Q(genre__id=genre_id)
             queryset = queryset.filter(genre_filter)
 
+        queryset = queryset.annotate(avg_rating=Avg('review__star'))
+
         return queryset
 
 
@@ -31,19 +35,30 @@ class GameDetail(generics.RetrieveAPIView):
     serializer_class = GameSerializer
     lookup_field = 'slug'
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        
+        queryset = Game.objects.filter(slug=instance.slug).annotate(avg_rating=Avg('review__star'))
+        
+        instance.avg_rating = queryset.values_list('avg_rating', flat=True).first()
+        
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
 
 class GameReviewListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = ReviewSerializer
+    
 
     def get_queryset(self):
         game_slug = self.kwargs['slug'] 
+        print(game_slug)
         return Review.objects.filter(game_fk__slug=game_slug)
 
 
     def perform_create(self, serializer):
-        get_user_data = get_user_from_request(self.request)
         game_slug = self.kwargs['slug']
-        print(get_user_data)
+        get_user_data = get_user_from_request(self.request)
         user = CustomUser.objects.get(username=get_user_data['username'])
         game = Game.objects.get(slug=game_slug)
         serializer.save(game_fk=game, user_fk=user)
